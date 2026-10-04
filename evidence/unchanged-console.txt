@@ -1,0 +1,8 @@
+Started by timer
+Running as SYSTEM
+Building in workspace /var/jenkins_home/workspace/delivery-lab
+[delivery-lab] $ /usr/bin/env bash /tmp/jenkins11608216045172403037.sh
+Building the mounted local source snapshot; no GitHub publication required.
+UNCHANGED: retaining the last successful delivery and its artifacts; tests and rollout were not rerun.
+Archiving artifacts
+Finished: SUCCESS

@@ -1,0 +1,2 @@
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES                        SELECTOR
+delivery-lab   2/2     2            2           14m   app          delivery-lab:49b8750b0b03-9   app=delivery-lab

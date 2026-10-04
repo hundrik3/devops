@@ -1,0 +1,28 @@
+services:
+  jenkins:
+    build: ./jenkins
+    image: delivery-lab-jenkins:1.0.0
+    container_name: delivery-lab-jenkins
+    # Linux host networking keeps the Kind API at 127.0.0.1 accessible.
+    network_mode: host
+    group_add:
+      - "${DOCKER_GID:?Run scripts/bootstrap.sh first}"
+    command: ["--httpListenAddress=127.0.0.1", "--httpPort=8080"]
+    environment:
+      JENKINS_ADMIN_PASSWORD: "${JENKINS_ADMIN_PASSWORD:?Run scripts/bootstrap.sh first}"
+      KUBECONFIG: /opt/config/kubeconfig
+      MAVEN_OPTS: -Djavax.net.ssl.trustStore=/opt/config/java-cacerts
+      MAVEN_ARGS: -s /opt/config/maven-settings.xml
+      KIND_CLUSTER_NAME: portfolio
+      HTTPS_PROXY: "${HTTPS_PROXY:-}"
+      HTTP_PROXY: "${HTTP_PROXY:-}"
+      NO_PROXY: "${NO_PROXY:-localhost,127.0.0.1}"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - .:/opt/lab:ro
+      - ./.local/kubeconfig:/opt/config/kubeconfig:ro
+      - ./.local/java-cacerts:/opt/config/java-cacerts:ro
+      - ./.local/maven-settings.xml:/opt/config/maven-settings.xml:ro
+volumes:
+  jenkins_home:

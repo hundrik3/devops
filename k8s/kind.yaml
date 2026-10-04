@@ -1,0 +1,13 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+networking:
+  ipFamily: ipv4
+# Native snapshotter also works in nested Docker environments without overlayfs.
+containerdConfigPatches:
+  - |-
+    [plugins."io.containerd.grpc.v1.cri".containerd]
+      snapshotter = "native"
+    [plugins."io.containerd.cri.v1.images"]
+      snapshotter = "native"

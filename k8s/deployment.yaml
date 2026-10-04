@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: delivery-lab
+  namespace: delivery-lab
+spec:
+  replicas: 2
+  revisionHistoryLimit: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: delivery-lab
+  template:
+    metadata:
+      labels:
+        app: delivery-lab
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: app
+          image: delivery-lab:bootstrap
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          startupProbe:
+            httpGet: {path: /healthz, port: 8080}
+            periodSeconds: 3
+            failureThreshold: 40
+          readinessProbe:
+            httpGet: {path: /readyz, port: 8080}
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: {path: /healthz, port: 8080}
+            periodSeconds: 10
+          volumeMounts:
+            - {name: temp, mountPath: /tmp}
+            - {name: logs, mountPath: /usr/local/tomcat/logs}
+            - {name: work, mountPath: /usr/local/tomcat/work}
+      volumes:
+        - {name: temp, emptyDir: {sizeLimit: 128Mi}}
+        - {name: logs, emptyDir: {sizeLimit: 64Mi}}
+        - {name: work, emptyDir: {sizeLimit: 64Mi}}

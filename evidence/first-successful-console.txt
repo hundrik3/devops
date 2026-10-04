@@ -1,0 +1,111 @@
+Started by user hundrik
+Running as SYSTEM
+Building in workspace /var/jenkins_home/workspace/delivery-lab
+[delivery-lab] $ /usr/bin/env bash /tmp/jenkins3036358150449825257.sh
+Building the mounted local source snapshot; no GitHub publication required.
+
+[1/5] Maven verify: compile, tests, WAR
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------------< ru.hundrik:delivery-lab >-----------------------
+[INFO] Building delivery-lab 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ war ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ delivery-lab ---
+[INFO] Deleting /var/jenkins_home/workspace/delivery-lab/source/target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ delivery-lab ---
+[INFO] skip non existing resourceDirectory /var/jenkins_home/workspace/delivery-lab/source/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ delivery-lab ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 2 source files with javac [debug release 17] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ delivery-lab ---
+[INFO] skip non existing resourceDirectory /var/jenkins_home/workspace/delivery-lab/source/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ delivery-lab ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 1 source file with javac [debug release 17] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.2:test (default-test) @ delivery-lab ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running ru.hundrik.portfolio.GreetingTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.044 s -- in ru.hundrik.portfolio.GreetingTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- war:3.4.0:war (default-war) @ delivery-lab ---
+[INFO] Packaging webapp
+[INFO] Assembling webapp [delivery-lab] in [/var/jenkins_home/workspace/delivery-lab/source/target/ROOT]
+[INFO] Processing war project
+[INFO] Copying webapp resources [/var/jenkins_home/workspace/delivery-lab/source/src/main/webapp]
+[INFO] Building war: /var/jenkins_home/workspace/delivery-lab/source/target/ROOT.war
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.793 s
+[INFO] Finished at: 2026-10-04T16:36:04Z
+[INFO] ------------------------------------------------------------------------
+
+[2/5] Build non-root Tomcat image: delivery-lab:49b8750b0b03-6
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  65.54kB
+Step 1/6 : FROM tomcat:10.1.34-jdk17-temurin@sha256:6cc7480fb8de7028d1f740704364703c55878564204bbe89186f549eb78e7ee7
+ ---> b52b0b2e12f3
+Step 2/6 : COPY --chown=10001:10001 target/runtime/ /usr/local/tomcat/webapps/ROOT/
+ ---> 7d354a54e33f
+Step 3/6 : ENV CATALINA_TMPDIR=/tmp
+ ---> Running in 795da03c442e
+ ---> Removed intermediate container 795da03c442e
+ ---> 0967e80796ae
+Step 4/6 : USER 10001:10001
+ ---> Running in c2601ca6fa2c
+ ---> Removed intermediate container c2601ca6fa2c
+ ---> aa0d08fcd79e
+Step 5/6 : EXPOSE 8080
+ ---> Running in 2e2c4ed2c8b5
+ ---> Removed intermediate container 2e2c4ed2c8b5
+ ---> c7d3453b2ebb
+Step 6/6 : CMD ["catalina.sh", "run"]
+ ---> Running in 307dd82cf23f
+ ---> Removed intermediate container 307dd82cf23f
+ ---> 007de4f7d0df
+Successfully built 007de4f7d0df
+Successfully tagged delivery-lab:49b8750b0b03-6
+
+[3/5] Load image into local Kubernetes
+unpacking docker.io/library/delivery-lab:49b8750b0b03-6 (sha256:933def83202661546f9629e741bb4b91e5c97cd2f7a66254d0c8a04b8710a3e5)...done
+
+[4/5] Deploy and wait for readiness
+namespace/delivery-lab unchanged
+deployment.apps/delivery-lab configured
+service/delivery-lab unchanged
+Waiting for deployment "delivery-lab" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "delivery-lab" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "delivery-lab" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "delivery-lab" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "delivery-lab" rollout to finish: 1 old replicas are pending termination...
+deployment "delivery-lab" successfully rolled out
+NAME                            READY   STATUS        RESTARTS   AGE   IP           NODE                      NOMINATED NODE   READINESS GATES
+delivery-lab-68d474854d-cvj9q   1/1     Running       0          13s   10.244.0.7   portfolio-control-plane   <none>           <none>
+delivery-lab-68d474854d-n2xxt   1/1     Running       0          6s    10.244.0.8   portfolio-control-plane   <none>           <none>
+delivery-lab-755c764987-xqwch   1/1     Terminating   0          4m    10.244.0.6   portfolio-control-plane   <none>           <none>
+
+[5/5] Functional HTTP checks
+PASS: health, readiness, default greeting, named greeting, homepage, HTTP 400
+
+SUCCESS: delivery-lab:49b8750b0b03-6
+Archiving artifacts
+Finished: SUCCESS

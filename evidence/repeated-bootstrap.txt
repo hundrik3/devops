@@ -1,0 +1,4 @@
+Set kubectl context to "kind-portfolio"
+node/portfolio-control-plane condition met
+ Container delivery-lab-jenkins  Running
+Jenkins login page is ready. User: hundrik. Password is in the ignored local .env file.
