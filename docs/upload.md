@@ -1,21 +1,21 @@
-# Самостоятельная загрузка на GitHub
+# Publishing to GitHub
 
-Архив содержит только исходники, документацию и результаты проверок. Локальный пароль Jenkins, kubeconfig, Maven cache и Docker-инструменты исключены.
+The project archive contains source code, documentation, and validation evidence. The local Jenkins password, kubeconfig, Maven cache, and Docker tools are excluded.
 
-Распакуйте архив. Из каталога `devops` можно загрузить проект в свой пустой репозиторий:
+After extracting the archive, publish the project to an empty repository from the `devops` directory:
 
 ```bash
 git init -b main
 git add .
 git status --short
-# Проверьте, что среди файлов нет .env, .local и kubeconfig.
+# Confirm that .env, .local, and kubeconfig are not staged.
 git commit -m "Add Java delivery lab with Jenkins, Docker and Kubernetes"
 git remote add origin https://github.com/hundrik3/devops.git
 git push -u origin main
 ```
 
-Эти команды рассчитаны на распакованный архив без `.git`. В существующей локальной копии репозитория повторно добавлять `origin` не нужно. Если удалённый репозиторий уже содержит коммиты, сначала получите их и согласуйте историю; не используйте force push.
+These commands assume an extracted archive without a `.git` directory. In an existing checkout, do not add `origin` again. If the remote already contains commits, fetch them and reconcile the history first; do not force push.
 
-Для демонстрации запустите стенд по README и сделайте собственные скриншоты успешной сборки Jenkins, двух pod и страницы приложения. Текст для портфолио находится в `docs/portfolio.md`, результаты проверки — в `docs/validation.md`.
+For a demonstration, start the lab using the README and take your own screenshots of a successful Jenkins build, two pods, and the application page. Portfolio presentation guidance is in `docs/portfolio.md`; validation results are in `docs/validation.md`.
 
-После публикации настройте параметр `SOURCE_REPOSITORY` в Jenkins на свой URL. Основной репозиторий проекта: https://github.com/hundrik3/devops. Эти команды также можно использовать для публикации распакованного архива в другом своём репозитории.
+Configure the Jenkins `SOURCE_REPOSITORY` parameter to use your published URL. The primary repository is https://github.com/hundrik3/devops. You can also adapt these commands to publish an extracted archive to another repository you own.

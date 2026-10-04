@@ -1,39 +1,39 @@
-# Проверка локального стенда
+# Local lab validation
 
-Дата: 4 октября 2026. Проверки выполнены в Linux x86_64 с Docker Engine 28.4.0 (storage driver vfs).
+Date: October 4, 2026. Validation ran on Linux x86_64 with Docker Engine 28.4.0 using the vfs storage driver.
 
-| Проверка | Результат | Подтверждение |
+| Check | Result | Evidence |
 |---|---|---|
-| Сборка Maven и упаковка WAR | PASS | Jenkins builds #6, #8, #9 |
+| Maven build and WAR packaging | PASS | Jenkins builds #6, #8, #9 |
 | JUnit | 4 tests, 0 failures, 0 errors, 0 skipped | evidence/junit.xml |
-| Docker build и локальный импорт containerd | PASS | evidence/jenkins-console.txt |
-| Kubernetes rollout | PASS, 2 доступные реплики | evidence/deployment.txt, evidence/pods.txt |
-| HTTP smoke | Все 6 проверок прошли | evidence/jenkins-console.txt |
-| Запрос через настоящий ClusterIP Service из Kind-ноды | Hello, Service! | evidence/service-response.txt |
-| Повторная доставка | PASS | Успешные builds #6 и #8 |
-| Архивирование WAR и JUnit XML | PASS | Итог Finished: SUCCESS; WAR проверен в Jenkins archive |
-| Пропуск неизменных исходников | PASS, build #7; тесты и rollout не выполнялись | evidence/unchanged-console.txt |
-| Rollback #8 → образ #6 и HTTP smoke | PASS | evidence/rollback.txt |
-| Восстановление образа #8 после rollback | PASS | evidence/rollback.txt |
-| Перезапуск Jenkins и Kubernetes | PASS; затем полная успешная сборка #9 | evidence/restart.txt, evidence/jenkins-build.json |
-| Повторный bootstrap без пересборки Jenkins | PASS | evidence/repeated-bootstrap.txt |
-| Авторизация Jenkins | Задание доступно с авторизацией, анонимный доступ закрыт | scripts/check-jenkins.py выполнен успешно |
-| Kubernetes server-side dry-run и Pod Security policy | PASS | deployment, service, namespace приняты API server |
-| Bash/Python syntax и Compose config | PASS | Проверены локальными командами |
+| Docker build and containerd local import | PASS | evidence/jenkins-console.txt |
+| Kubernetes rollout | PASS, 2 available replicas | evidence/deployment.txt, evidence/pods.txt |
+| HTTP smoke tests | All 6 checks passed | evidence/jenkins-console.txt |
+| Request through the actual ClusterIP Service from the Kind node | Hello, Service! | evidence/service-response.txt |
+| Repeated delivery | PASS | Successful builds #6 and #8 |
+| WAR and JUnit XML archiving | PASS | Finished: SUCCESS; WAR verified in the Jenkins archive |
+| Unchanged-source optimization | PASS, build #7; tests and rollout were skipped | evidence/unchanged-console.txt |
+| Rollback from build #8 to image #6, followed by HTTP smoke tests | PASS | evidence/rollback.txt |
+| Restoration of image #8 after rollback | PASS | evidence/rollback.txt |
+| Jenkins and Kubernetes restart | PASS; followed by full successful build #9 | evidence/restart.txt, evidence/jenkins-build.json |
+| Repeated bootstrap without rebuilding Jenkins | PASS | evidence/repeated-bootstrap.txt |
+| Jenkins authentication | Authenticated job access works; anonymous access is denied | scripts/check-jenkins.py completed successfully |
+| Kubernetes server-side dry-run and Pod Security policy | PASS | API server accepted the Deployment, Service, and Namespace |
+| Bash/Python syntax and Compose configuration | PASS | Checked with local commands |
 
-Версии: Jenkins 2.541.3 / JDK 21, Maven 3.9.9, приложение с Java release 17 на Tomcat 10.1.34 / JDK 17, Kind 0.27.0, Kubernetes/kubectl 1.32.2. Docker-образы закреплены digest, CLI-файлы проверены SHA-256.
+Versions: Jenkins 2.541.3 / JDK 21, Maven 3.9.9, application compiled with Java release 17 and served by Tomcat 10.1.34 / JDK 17, Kind 0.27.0, and Kubernetes/kubectl 1.32.2. Docker images are pinned by digest, and CLI binaries are verified with SHA-256.
 
-## Исправленные проблемы настройки
+## Resolved setup issues
 
-- Вложенная Docker-среда не поддерживала IPv6 iptables и overlayfs внутри Kind. Использована сеть IPv4 и native snapshotter.
-- Для containerd 2 импорт через transfer API не поддерживал выбранный snapshotter. Использован локальный `ctr images import --local --snapshotter=native`.
-- Отсутствующий kernel log device восстановлен внутри собственной Kind-ноды.
-- Maven настроен на существующий HTTPS proxy и доверенные CA, без отключения TLS verification.
-- Исправлены права чтения init-скрипта и выполнения CLI в контейнере Jenkins.
-- При первых сборках vfs занял диск: функциональные проверки проходили, но архивирование завершалось ошибкой. Удалены только промежуточные артефакты настройки, Dockerfile сокращён до одного слоя приложения, повторная сборка Jenkins зависит от хеша входов и ID образа, неизменный здоровый Deployment не пересобирается. Итоговые builds #6, #8 и #9 полностью успешны.
+- The nested Docker environment did not support IPv6 iptables or overlayfs inside Kind. An IPv4 network and the native snapshotter were used.
+- The containerd 2 transfer import API could not unpack the selected snapshotter. Local `ctr images import --local --snapshotter=native` resolved the issue.
+- The missing kernel log device was restored inside the lab's own Kind node.
+- Maven was configured to use the existing HTTPS proxy and trusted CA certificates without disabling TLS verification.
+- Read permissions for the init script and execute permissions for the CLI binaries were corrected in the Jenkins container.
+- Initial builds exhausted disk space with vfs: functional checks passed, but archiving failed. Intermediate setup artifacts were removed, the Dockerfile was reduced to a single application layer, Jenkins image rebuilding was made conditional on input hashes and image identity, and unchanged healthy deployments were excluded from rebuilding. Final builds #6, #8, and #9 succeeded completely.
 
-## Не выполнялось
+## Not performed
 
-AWS EC2, push образа в registry, GitHub webhook, удалённый GitHub-режим после пользовательской публикации, security scan, нагрузочный тест и непрерывное измерение доступности при rolling update. Скриншоты не создавались; их можно сделать на своём стенде по docs/portfolio.md.
+AWS EC2 deployment, image registry publishing, GitHub webhooks, remote GitHub source mode after publication, security scanning, load testing, and continuous availability measurement during rolling updates were not performed. Screenshots were not generated; take them from your own lab following docs/portfolio.md.
 
-Это доказательства текущего локального запуска. Новая облачная задача после публикации snapshot отдельно не проверялась. Конфигурация install_script и start_skill сохранена в черновик среды; публикация облачной среды отдельно не проверялась. Проверки приложения относятся к локальному стенду, а не к GitHub-hosted инфраструктуре.
+This evidence covers the current local environment. Restoration in a new cloud task after snapshot publication was not independently tested. The install_script and start_skill configuration fields were saved as an environment draft; cloud environment publication was not independently verified. Application checks refer to the local lab, not GitHub-hosted infrastructure.
